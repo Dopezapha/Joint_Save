@@ -6,6 +6,7 @@ import { GroupDetails } from "@/components/group/group-details"
 import { GroupMembers } from "@/components/group/group-members"
 import { GroupActivity } from "@/components/group/group-activity"
 import { GroupActions } from "@/components/group/group-actions"
+import { YieldDashboard } from "@/components/group/yield-dashboard"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft } from "lucide-react"
 import Link from "next/link"
@@ -52,14 +53,6 @@ export default function GroupPage({ params }: { params: Promise<{ id: string }> 
   if (loading) return <div>Loading...</div>
   if (!pool) return <div>Pool not found</div>
 
-  /**
-   * All four child components share this cache key so only ONE RPC batch
-   * fires regardless of how many components mount simultaneously.
-   *
-   * Deployed pools key by contract address (C…).
-   * Pending-deployment pools fall back to the DB UUID so components can still
-   * display DB metadata while there is no on-chain state to read.
-   */
   const cacheKey =
     pool.contract_address && pool.contract_address !== "pending_deployment"
       ? pool.contract_address
@@ -77,20 +70,11 @@ export default function GroupPage({ params }: { params: Promise<{ id: string }> 
         </Button>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* ── Left column: details + activity ──────────────────────────── */}
           <div className="lg:col-span-2 space-y-6">
-            <GroupDetails
-              groupId={id}
-              contractAddress={cacheKey}
-            />
-            <GroupActivity
-              groupId={id}
-              contractAddress={cacheKey}
-              startLedger={0}
-            />
+            <GroupDetails groupId={id} contractAddress={cacheKey} />
+            <GroupActivity groupId={id} contractAddress={cacheKey} startLedger={0} />
           </div>
 
-          {/* ── Right column: actions + members ──────────────────────────── */}
           <div className="space-y-6">
             <GroupActions
               groupId={id}
@@ -101,10 +85,10 @@ export default function GroupPage({ params }: { params: Promise<{ id: string }> 
               poolAdmin={poolAdmin}
               onPauseChange={refreshPoolState}
             />
-            <GroupMembers
-              groupId={id}
-              contractAddress={cacheKey}
-            />
+            {pool.type === "flexible" && (
+              <YieldDashboard poolAddress={pool.contract_address} />
+            )}
+            <GroupMembers groupId={id} contractAddress={cacheKey} />
           </div>
         </div>
       </main>
