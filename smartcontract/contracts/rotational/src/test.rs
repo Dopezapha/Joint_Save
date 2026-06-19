@@ -28,6 +28,7 @@ struct TestPool<'a> {
 fn setup_pool<'a>(env: &Env) -> TestPool<'a> {
     let token_admin = Address::generate(env);
     let (token_id, sac) = create_token(env, &token_admin);
+    let admin = Address::generate(env);
     let treasury = Address::generate(env);
     let member_a = Address::generate(env);
     let member_b = Address::generate(env);
@@ -39,7 +40,8 @@ fn setup_pool<'a>(env: &Env) -> TestPool<'a> {
     let pool = RotationalPoolClient::new(env, &pool_id);
     pool.initialize(
         &token_id,
-        &vec![env, member_a.clone(), member_b.clone()],
+        &admin,
+        &vec![&env, member_a.clone(), member_b.clone()],
         &DEPOSIT_AMOUNT,
         &ROUND_DURATION,
         &100,
@@ -115,6 +117,7 @@ fn deposit_and_payout_work_without_a_reputation_tracker_configured() {
 
     let token_admin = Address::generate(&env);
     let (token_id, sac) = create_token(&env, &token_admin);
+    let admin = Address::generate(&env);
     let treasury = Address::generate(&env);
     let member_a = Address::generate(&env);
     let member_b = Address::generate(&env);
@@ -125,6 +128,7 @@ fn deposit_and_payout_work_without_a_reputation_tracker_configured() {
     let pool = RotationalPoolClient::new(&env, &pool_id);
     pool.initialize(
         &token_id,
+        &admin,
         &vec![&env, member_a.clone(), member_b.clone()],
         &DEPOSIT_AMOUNT,
         &ROUND_DURATION,
