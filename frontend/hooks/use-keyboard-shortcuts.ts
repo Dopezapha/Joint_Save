@@ -49,9 +49,15 @@ export function useKeyboardShortcuts(handlers: ShortcutHandlers) {
           }
           return
         }
+        return
       }
 
-      if (key === "?") {
+      if (
+        key === "?" &&
+        !e.metaKey &&
+        !e.ctrlKey &&
+        !e.altKey
+      ) {
         e.preventDefault()
         handlersRef.current.onOpenHelp()
         return
